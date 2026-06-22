@@ -38,12 +38,12 @@ During inference, text is not required. The semantic memory is provided as an ex
 image
   ├─ visual encoder -> multi-scale visual tokens
   ├─ BiomedCLIP image embedding -> prototype retrieval -> semantic tokens
-  └─ frozen SAM image encoder or dense prompt feature
+  └─ frozen SAM image encoder
 
 visual tokens + semantic tokens
   -> coarse mask confidence map
   -> high-confidence point prompts
-  -> SAM prompt encoder + LoRA SAM mask decoder
+  -> SAM prompt encoder + SAM mask decoder
   -> segmentation mask
 ```
 
@@ -73,8 +73,6 @@ cfg = TeFSAMConfig(
     prototype_dim=1536,
     clip_dim=768,
     sam_checkpoint="./model/medsam_vit_b.pth",
-    decoder_image_source="sam_encoder",  # or "dense_prompt"
-    lora_rank=8,
 )
 
 class MySemanticMemory:
@@ -99,7 +97,6 @@ Recommended trainable parts:
 - multi-scale fusion module,
 - coarse mask prompt generator,
 - point/mask prompt adapter,
-- LoRA parameters inside the SAM mask decoder,
 - trainable semantic memory parameters, if your private memory module exposes them.
 
 Frozen parts:
@@ -116,16 +113,3 @@ loss = DiceCE(segmentation_mask, gt) + lambda * DiceCE(coarse_mask, gt)
 ```
 
 The original project used `lambda = 0.2`.
-
-## Decoder Image Source
-
-`decoder_image_source` controls the image embedding sent to SAM mask decoder:
-
-- `sam_encoder`: use frozen SAM image encoder features. This is the SAM-consistent path.
-- `dense_prompt`: use the adapted dense visual prompt feature resized to SAM's embedding grid. This reproduces the dense-prompt ablation path.
-
-For a clean paper implementation, `sam_encoder` is easier to justify. Keep `dense_prompt` only if reporting the ablation or matching older checkpoints.
-
-## LoRA
-
-The cleaned implementation injects LoRA into linear layers of `mask_decoder.transformer`. Only parameters with `lora_` in their names are trainable inside the SAM mask decoder. This avoids relying on a private `segment_anything` build that already implements `enable_lora()`.
