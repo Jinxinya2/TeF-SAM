@@ -10,6 +10,7 @@ This folder is a clean model-only extraction from the original experimental proj
 opensource_model/
 ├── README.md
 ├── ARCHITECTURE.md
+├── environment_requirements.txt
 ├── requirements-minimal.txt
 └── tefsam/
     ├── config.py
@@ -129,17 +130,3 @@ For a clean paper implementation, `sam_encoder` is easier to justify. Keep `dens
 ## LoRA
 
 The cleaned implementation injects LoRA into linear layers of `mask_decoder.transformer`. Only parameters with `lora_` in their names are trainable inside the SAM mask decoder. This avoids relying on a private `segment_anything` build that already implements `enable_lora()`.
-
-## What Is Not Included
-
-This folder does not include:
-
-- training scripts,
-- dataloaders,
-- dataset splits,
-- checkpoints,
-- prototype files,
-- visualization utilities,
-- experiment logs.
-
-Those should be released separately only if needed for reproducibility.
