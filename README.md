@@ -9,7 +9,6 @@ This folder is a clean model-only extraction from the original experimental proj
 ```text
 opensource_model/
 ├── README.md
-├── ARCHITECTURE.md
 ├── environment_requirements.txt
 ├── requirements-minimal.txt
 └── tefsam/
