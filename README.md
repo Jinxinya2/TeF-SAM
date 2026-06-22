@@ -1,12 +1,17 @@
 # TeF-SAM
 
-TeF-SAM is a prototype-guided SAM segmentation model for partially paired image-text medical segmentation. The model uses paired image-text data to build a semantic prototype memory, then performs inference with images only.
+Medical lesion segmentation often depends on large, high-quality pixel-level annotations, which are costly to obtain because they require expert delineation. Recent multimodal methods use clinical text to improve visual representation learning, but they usually require paired image-report data during training and text input during inference. This dependency limits their use when paired reports are scarce or when segmentation is performed before report generation.
+To address this limitation, we propose TeF-SAM, a Segment Anything Model (SAM)-based framework for limited-text training and text-free medical lesion segmentation. TeF-SAM builds a Persistent Region-Informed Semantic Memory (PRISM) from the paired reports available during training. 
+PRISM distils segmentation-relevant textual knowledge into a region-aware prototype space, allowing image features to retrieve semantic cues at inference without online text input. 
+We further introduce Prototype-Driven Regional Lesion Detection (PRLD), which combines prototype-level semantic responses with multi-scale visual features to generate SAM-compatible prompts, including coarse masks, points, and semantic embeddings.
+We evaluate TeF-SAM on three lesion segmentation benchmarks spanning different anatomies and imaging modalities: QaTa-COV19, MosMedData+, and BUSI. 
+Experimental results show that TeF-SAM achieves competitive segmentation performance using only 1\%--15\% of the available paired reports and requires no text input during inference.
 
-This folder is a clean model-only extraction from the original experimental project. It intentionally excludes datasets, logs, visualization scripts, ablation scripts and local training artifacts.
+<img width="6347" height="3364" alt="model" src="https://github.com/user-attachments/assets/acdaa847-cf16-43c2-9540-af886b85d131" />
 
 ## Directory
 
-```text
+
 opensource_model/
 ├── README.md
 ├── environment_requirements.txt
