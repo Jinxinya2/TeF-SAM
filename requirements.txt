@@ -1,0 +1,16 @@
+# Install a CUDA-appropriate PyTorch and torchvision build first.
+torch>=2.1
+torchvision>=0.16
+
+accelerate>=0.29,<2.0
+einops>=0.7,<0.9
+monai>=1.0,<1.6
+numpy>=1.24,<2.0
+Pillow>=10.0,<12.0
+PyYAML>=6.0,<7.0
+safetensors>=0.4,<0.6
+tqdm>=4.66,<5.0
+transformers>=4.40,<5.0
+
+# Vendored dependency used by the SAM adapter.
+-e ./third_party/segment_anything

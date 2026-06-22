@@ -1,43 +1,75 @@
-from dataclasses import dataclass
-from typing import Optional, Tuple
+from __future__ import annotations
+
+import copy
+import os
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Any, Dict, Iterable
+
+import yaml
 
 
-@dataclass
-class TeFSAMConfig:
-    image_size: Tuple[int, int] = (224, 224)
-    device: str = "cuda"
+class Config(dict):
+    """Flat, attribute-accessible configuration used by the released models."""
 
-    vision_type: str = "facebook/convnext-tiny-224"
-    biomedclip_path: str = "./model"
-    biomedclip_tokenizer: str = "chuhac/BiomedCLIP-vit-bert-hf"
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return self[name]
+        except KeyError as error:
+            raise AttributeError(name) from error
 
-    num_classes: int = 6
-    num_prototypes: int = 16
-    num_candidate: int = 3
-    prototype_dim: int = 1536
-    clip_dim: int = 768
-    text_dim: int = 768
-    text_len: int = 256
-    text_feature_dim: int = 768
-    agg: str = "attention"
+    def __setattr__(self, name: str, value: Any) -> None:
+        self[name] = value
 
-    sam_checkpoint: Optional[str] = None
-    sam_model_type: str = "vit_b"
-    sam_prompt_dim: int = 256
-    sam_image_embedding: int = 64
-    decoder_image_source: str = "sam_encoder"
-    sam_encoder_batch_size: int = 1
+    def clone(self) -> "Config":
+        return Config(copy.deepcopy(dict(self)))
 
-    point_topk: int = 8
-    point_threshold: float = 0.9
-    point_quantile: float = 0.995
-    use_local_max: bool = True
-    use_quantile_threshold: bool = True
-    max_candidates: int = 1024
-    initial_point_topk: int = 4
-    correction_iters: int = 3
-    correction_num_points: int = 2
+    def with_overrides(self, values: Mapping[str, Any]) -> "Config":
+        output = self.clone()
+        for key, value in values.items():
+            output[key] = value
+        return output
 
-    lora_rank: int = 8
-    lora_alpha: float = 1.0
-    mask_prompt_loss_weight: float = 0.2
+
+def _flatten_sections(payload: Mapping[str, Any]) -> Dict[str, Any]:
+    flattened: Dict[str, Any] = {}
+    owners: Dict[str, str] = {}
+    for section, values in payload.items():
+        if not isinstance(values, Mapping):
+            if section in flattened:
+                raise ValueError(f"Duplicate configuration key: {section}")
+            flattened[section] = values
+            owners[section] = "<root>"
+            continue
+        for key, value in values.items():
+            if key in flattened and flattened[key] != value:
+                raise ValueError(
+                    f"Configuration key '{key}' is defined in both "
+                    f"'{owners[key]}' and '{section}'"
+                )
+            flattened[key] = value
+            owners[key] = str(section)
+    return flattened
+
+
+def load_config(path: str | os.PathLike[str]) -> Config:
+    config_path = Path(path)
+    if not config_path.is_file():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+    with config_path.open("r", encoding="utf-8") as stream:
+        payload = yaml.safe_load(stream) or {}
+    if not isinstance(payload, Mapping):
+        raise TypeError("The top level of a configuration file must be a mapping")
+    cfg = Config(_flatten_sections(payload))
+    cfg.config_path = str(config_path.resolve())
+    return cfg
+
+
+def apply_overrides(cfg: Config, assignments: Iterable[str]) -> Config:
+    output = cfg.clone()
+    for assignment in assignments:
+        if "=" not in assignment:
+            raise ValueError(f"Expected KEY=VALUE override, got: {assignment}")
+        key, raw_value = assignment.split("=", 1)
+        output[key] = yaml.safe_load(raw_value)
+    return output

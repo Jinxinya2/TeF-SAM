@@ -1,0 +1,66 @@
+EXPERIMENT:
+  experiment_name: qata_cov19_r15_prism_3x2
+
+TRAIN:
+  seed: 42
+  batch_size: 32
+  lr: 0.0001
+  training_ratio: 0.15
+  validation_ratio: 0.15
+  image_size: [224, 224]
+  min_epochs: 30
+  max_epochs: 50
+  patience: 20
+  device: cuda
+  num_workers: 8
+  mixed_precision: true
+  segmentation_weight_decay: 0.0
+  scheduler_t_max: 200
+  scheduler_min_lr: 0.000001
+  checkpoint_path: null
+  output_checkpoint: ./checkpoints/qata_cov19/tefsam_r15_prism_3x2.ckpt
+
+PRISM_RUNTIME:
+  repository_manifest: ./artifact_manifests/qata_cov19_prism_3x2_r15.json
+  repository_artifact: ./artifacts/qata_cov19_prism_3x2_r15.safetensors
+  # Null uses the checkpoint and pinned revision from the artifact manifest.
+  biomedclip_checkpoint: null
+  biomedclip_local_files_only: false
+  agg: memory
+  num_candidate: 4
+
+LORA:
+  sam_lora_enabled: true
+  sam_lora_rank: 4
+  sam_lora_alpha: 8.0
+  sam_lora_dropout: 0.05
+  sam_lora_only: false
+
+MODEL:
+  vision_type: facebook/convnext-tiny-224
+  vision_revision: 6166b7613034066690a621d8bf25ffdf181a34f0
+  vision_local_files_only: false
+  vision_feature_dims: [768, 384, 192, 96]
+  vision_spatial_dims: [7, 14, 28, 56]
+  text_dim: 768
+  sam_prompt_dim: 256
+  sam_image_embedding: 64
+  fusion_token_grid: 56
+  sam_checkpoint: ./weights/medsam_vit_b.pth
+  sam_model_type: vit_b
+  mask_prompt_loss_weight: 0.2
+  point_topk: 8
+  correction_points_per_class: 2
+  point_threshold: 0.9
+  use_approx1: false
+
+DATA:
+  dataset_name: QaTa-COV19
+  ann_path: ./splits/qata_cov19_split.json
+  root_path: ./data/QaTa
+  image_dir: images
+  mask_dir: masks
+  image_extension: .png
+  mask_extension: .png
+  validation_split: val
+  test_split: test

@@ -1,0 +1,33 @@
+{
+  "artifact_filename": "qata_cov19_prism_3x2_r15.safetensors",
+  "artifact_id": "qata_cov19_prism_3x2_r15",
+  "dataset": "QaTa-COV19",
+  "download_url": null,
+  "embedding_dim": 512,
+  "feature_dim": 768,
+  "grid_cols": 2,
+  "grid_rows": 3,
+  "image_encoder": {
+    "checkpoint": "chuhac/BiomedCLIP-vit-bert-hf",
+    "revision": "c44fed22e30460c0ea1b033a41b68fdab375d64c"
+  },
+  "image_size": [
+    224,
+    224
+  ],
+  "manifest_version": 1,
+  "memory_tokens": 16,
+  "num_candidates": 4,
+  "num_prototypes": 16,
+  "num_regions": 6,
+  "paired_ratio": 0.15,
+  "patch_mil_temperature": 0.07,
+  "query_schema": "hierarchical-regional-retrieval-v1",
+  "region_gate_weight": 1.0,
+  "region_position_scale": 0.1,
+  "response_temperature": 1.0,
+  "retrieval_dim": 512,
+  "retrieval_temperature": 0.1,
+  "runtime_format": "tefsam-frozen-prism-v1",
+  "split_seed": 42
+}

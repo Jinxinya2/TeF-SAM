@@ -1,6 +1,6 @@
-from .config import TeFSAMConfig
-from .model import TeFSAM
-from .sam_adapter import SAMPromptDecoder
-from .semantic_memory import SemanticMemory
+"""Public TeF-SAM segmentation package."""
 
-__all__ = ["TeFSAM", "TeFSAMConfig", "SAMPromptDecoder", "SemanticMemory"]
+from .config import Config, load_config
+
+__all__ = ["Config", "load_config"]
+__version__ = "0.1.0"
