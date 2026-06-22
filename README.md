@@ -52,19 +52,6 @@ visual tokens + semantic tokens
   -> segmentation mask
 ```
 
-## Recommended Prototype Construction
-
-Use `prototype_build_mode="image_key_text_value"`:
-
-1. Encode paired training images as retrieval keys.
-2. Encode paired texts as token-level semantic values.
-3. Group samples by pseudo class.
-4. Initialize class prototypes by farthest-point sampling.
-5. Refine prototypes with balanced Sinkhorn assignment.
-6. Store averaged text-token memories as prototype values.
-
-This produces an image-queryable semantic memory, which is the key difference from direct text-conditioned segmentation.
-
 ## Minimal Usage
 
 ```python
